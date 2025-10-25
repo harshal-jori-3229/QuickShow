@@ -21,5 +21,35 @@ app.use(clerkMiddleware())
 app.get('/', (req, res)=> res.send('server is live'));
 app.use('/api/inngest', serve({ client: inngest, functions }))
 
+app.post('/api/test/create-user', async (req, res) => {
+  try {
+    const event = {
+      name: 'clerk/user.created',
+      data: {
+        id: "test_user_" + Date.now(),
+        first_name: "Test",
+        last_name: "User",
+        email_addresses: [{ email_address: "testuser@example.com" }],
+        image_url: "https://example.com/testuser.png"
+      }
+    };
+
+    // Send event to Inngest
+    await inngest.send(event);
+
+    res.status(200).json({
+      success: true,
+      message: "Test user creation event sent successfully!",
+      event
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 app.listen(port, ()=> console.log(`Server is listening at http://localhost:${port}`));
+
+
+
+
