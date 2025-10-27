@@ -1,9 +1,11 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
-
+import connectDB from "../configs/db.js"; 
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
+
+await connectDB();
 
 //Inngest function to save user data to a database 
 const synUserCreation = inngest.createFunction(
@@ -18,6 +20,7 @@ const synUserCreation = inngest.createFunction(
             image: image_url
         }
         await User.create(userData);
+        console.log("✅ User created:", userData.email);
     }
 )
 
