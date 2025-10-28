@@ -11,28 +11,15 @@
 
 // export default connectDB;
 
+
 import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(`${process.env.MONGODB_URI}/QuickShow`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    // Listen for connection success
-    mongoose.connection.on("connected", () => {
-      console.log("✅ Database Connected Successfully");
-    });
-
-    // Listen for errors
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB Connection Error:", err);
-    });
-
+    await mongoose.connect(`${process.env.MONGODB_URI}/QuickShow`);
+    console.log("✅ Database Connected Successfully");
   } catch (error) {
-    console.error("❌ Connection Failed:", error.message);
+    console.error("❌ MongoDB Connection Failed:", error.message);
   }
 };
 
