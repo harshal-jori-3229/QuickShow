@@ -6,20 +6,46 @@ import User from "../models/User.js";
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
 
 //Inngest function to save user data to a database 
-const synUserCreation = inngest.createFunction(
-    {id: 'sync-user-from-clerk'},
-    {event: 'clerk/user.created'},
-    async ({event}) => {
-        const {id, first_name, last_name, email_addresses, image_url} = event.data
-        const userData ={
-            _id: id,
-            email: email_addresses[0].email_address,
-            name: first_name + ' ' + last_name,
-            image: image_url
-        }
-        await User.create(userData);
+// const synUserCreation = inngest.createFunction(
+//     {id: 'sync-user-from-clerk'},
+//     {event: 'clerk/user.created'},
+//     async ({event}) => {
+//         const {id, first_name, last_name, email_addresses, image_url} = event.data
+//         const userData ={
+//             _id: id,
+//             email: email_addresses[0].email_address,
+//             name: first_name + ' ' + last_name,
+//             image: image_url
+//         }
+//         await User.create(userData);
+//     }
+// )
+
+export const syncUserCreation = inngest.createFunction(
+  { id: "sync-user-from-clerk" },
+  { event: "clerk/user.created" },
+  async ({ event }) => {
+    try {
+      await connectDB(); // ✅ ensure Mongo connected
+
+      const { id, first_name, last_name, email_addresses, image_url } = event.data;
+
+      const userData = {
+        _id: id,
+        name: `${first_name} ${last_name}`,
+        email: email_addresses?.[0]?.email_address,
+        image: image_url,
+      };
+
+      console.log("📩 Inngest received user:", userData);
+
+      const result = await User.create(userData);
+      console.log("✅ User saved:", result);
+    } catch (error) {
+      console.error("❌ Error creating user:", error);
     }
-)
+  }
+);
 
 //Inngest function to Delete user data to a database 
 const synUserDeletion = inngest.createFunction(
@@ -53,3 +79,16 @@ export const functions = [
     synUserDeletion,
     synUserUpdation
 ];
+
+
+
+
+
+
+
+
+
+
+
+
+
